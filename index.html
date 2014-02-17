@@ -1,0 +1,44 @@
+<canvas id="canvas" width="500" height="500" style="border:1px solid #d3d3d3;margin:0 auto;display:block"></canvas>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+
+	var canvas = document.getElementById("canvas");
+	var context = canvas.getContext("2d");
+
+  var socket = io.connect('http://localhost');
+
+  socket.on('welcome', function (data) {
+  	var nickname=prompt(data);
+  	clear();
+    if(nickname){
+    	socket.emit('setNickname',nickname);
+    }
+  });
+
+  socket.on('tapped',function(data){
+	var k=0;
+	for(var i in data){
+		if(k===0){
+			context.fillStyle="#FF9E66";
+        	context.fillRect(0, 0, data[i]*25, canvas.height);
+		}else{
+			context.fillStyle="#A6FFE5";
+        	context.fillRect(canvas.width - data[i]*25, 0, data[i]*25, canvas.height);
+		}
+
+		k++;
+	}
+  });
+
+  document.onkeypress=function(event){
+  	if(event.keyCode===32){
+		socket.emit('tap');
+  	}
+  }
+
+  function clear(){
+  	context.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+</script>
